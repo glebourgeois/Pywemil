@@ -2,3 +2,15 @@
           Pywemil
  The Python Web-Mining Library
 *******************************
+
+Python Version :
+  This library uses Python 3. All dependencies also use Python 3.
+
+Licence :
+  This Software is released under BSD license.
+
+Dependencies :
+  Some dependencies are necessary to use extra-modules : tools, parsers. Pywemil Core can be used out of the box. To use tools and parsers, you may have to install following libraries :
+  
+  PyQt4 [http://www.riverbankcomputing.co.uk/software/pyqt/download]
+  xlrd3 [http://pypi.python.org/pypi/xlrd3]
