@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf8 -*-
 
 import operator, math
@@ -7,7 +6,9 @@ __author__ = "glebourgeois@me.com"
 
 class WFHistogram:
   """
-  A class aiming at tokenizing text, records it as histograms,
+  Word Frequencies Histogram : representing a document as 
+  token frequencies.
+  This class aims at tokenizing text, records it as histograms,
   and then enable comparisons, extractions, some semantic.
   """
 
