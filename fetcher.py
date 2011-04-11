@@ -65,6 +65,10 @@ class Fetcher:
       
       links = dom_funs.extract_doc_links( dom )
       for key in links:
+        # We do not want anchors to be crawled
+        if key[0] == '#':
+          continue
+        
         url = urllib.parse.urljoin(domain, key)
         
         # Trying to get eventual file extension, and to check its validity
