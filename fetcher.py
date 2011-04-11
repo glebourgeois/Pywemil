@@ -1,15 +1,13 @@
 # -*- coding: utf8 -*-
 
 import urllib.request, urllib.error, urllib.parse
-import re
-import html.parser
-import socket
+import re, html.parser, socket, sys
 
 import html5lib
 import html5lib.treewalkers
 import html5lib.serializer
 
-import html5wrapper
+from Pywemil import html5wrapper
 
 # defines a timeout to stop trying to reach a server
 socket.setdefaulttimeout( 5 )
@@ -63,7 +61,7 @@ class Fetcher:
           print( e )
         return {}
       
-      links = dom_funs.extract_doc_links( dom )
+      links = html5wrapper.extract_doc_links( dom )
       for key in links:
         # We do not want anchors to be crawled
         if key[0] == '#':
