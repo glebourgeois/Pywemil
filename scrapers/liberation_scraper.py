@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 
 import re, time, random
 from Pywemil.fetcher      import Fetcher
+import Pywemil.html5wrapper as html5wrapper
 
 class LiberationScraper:
 
@@ -18,7 +20,8 @@ class LiberationScraper:
     self.re_article = '<div class="article">.*?<div class="object-content">(.*?)</div>'
     self.re_author = 'Par <strong>(.*?)</strong>'
     self.re_link = '<a href="(.*?)">'
-    self.re_nnext = '<a href="(.*?)" class="next">'
+    #self.re_nnext = '<a href="(.*?)" class="next">'
+    self.re_nnext = '<a class="next" href="(.*?)">'
     self.re_txt = '<div class="articleContent">(.*?)</div>'
     
   def scrape_period(self, expression, bday, bmonth, byear, eday, emonth, eyear):
@@ -31,18 +34,31 @@ class LiberationScraper:
     count = 1
     
     while next is True:
+      print("\t[%d]" % count)
+      count += 1
+      
       # fetching page
+      page = None
       page = self.fetcher.fetch(query)
       if page is None:
-        continue
-      page = page.decode("utf-8")
+        # Let's try again
+        time.sleep(3)
+        page = self.fetcher.fetch(query)
+        
+        if page is None:
+          print( "Impossible to fetch [%s]" % query )
+          break
+      
+      page = html5wrapper.clean_html( page )
       
       # is there a next link
       m = re.search(self.re_nnext, page, re.U)
       if m is not None:
         url = m.group(1).strip()
         query = "%s%s" % (self.base_url, url)
+        query = query.replace("&amp;amp=", "")
       else:
+        print("\t> Last page reached.")
         next = False
      
       links = self._extract_articles(page)
@@ -52,16 +68,19 @@ class LiberationScraper:
         # Let's now extract text from each article, with some courtoisy
         time.sleep( random.uniform(1, 3) )
         p = self.fetcher.fetch( l )
-        if p is not None:          
-          p = p.decode("utf-8")
+        if p is not None:
+          p = html5wrapper.clean_html( p )
           m = re.search(self.re_txt, p, re.U|re.M|re.S)
         
           if m is not None:
             txt = m.group(1).strip()
             txt = "[%s]\n%s" % (l, txt)
-            self.txt.append( txt )
-                
-      count += 1      
+            self.txt.append( txt )            
+          else:
+            print("\n\t[%s] impossible to extract article" % l)
+
+      #FIXME: FAKE break for testing purpose
+      #break
     
     # Building final result
     res = {}

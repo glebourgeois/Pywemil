@@ -9,6 +9,9 @@ Python Version :
 Licence :
   This Software is released under BSD license.
 
+Mandatory Dependencies :
+  Chardet [http://chardet.feedparser.org/]
+
 Dependencies :
   Some dependencies are necessary to use extra-modules : tools, parsers. Pywemil Core can be used out of the box. To use tools and parsers, you may have to install following libraries :
   

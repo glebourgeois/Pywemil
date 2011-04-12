@@ -64,7 +64,7 @@ class Fetcher:
       links = html5wrapper.extract_doc_links( dom )
       for key in links:
         # We do not want anchors to be crawled
-        if key[0] == '#':
+        if len(key) < 1 or key[0] == '#':
           continue
         
         url = urllib.parse.urljoin(domain, key)

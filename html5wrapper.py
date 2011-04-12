@@ -327,10 +327,10 @@ def get_text_from_subtree(node):
   return txt
   
 def clean_html(html):
-"""
-Takes a raw html string, and converts it into a good html string, 
-well encoded.
-"""
+  """
+  Takes a raw html string, and converts it into a good html string, 
+  well encoded.
+  """
   p = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("dom"))
   doc = p.parse( html )
 
