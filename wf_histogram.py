@@ -12,7 +12,7 @@ class WFHistogram:
   and then enable comparisons, extractions, some semantic.
   """
 
-  def __init__(self, text, blacklist):
+  def __init__(self, text, blacklist, locale="fr"):
     """
     blacklist must be a set of tokens
     """
@@ -20,6 +20,7 @@ class WFHistogram:
     self.freq = {}
     self.tokens = set()
     self.blacklist = blacklist
+    self.locale = "fr"
 
     self._make_histogram(self.raw)
 
@@ -28,8 +29,9 @@ class WFHistogram:
     self._make_histogram( t )
 
   def _make_histogram(self, t):
-    sep = set([' ', '\n', '\t', '<', '>', '.', ',', ':', '/', '\r', ';', '-', '!', \
-               '?', '(', ')', '"', '|', "'", '’', '+', '*', '}', '{'])
+    sep = set([' ', '\n', '\t', '<', '>', '.', ',', ':', '/', '\r', ';', '!', \
+               '?', '(', ')', '"', '|', "'", '’', '+', '*', '}', '{', '»', '[', \
+               ']', '«', '=', '#'])
     t = t.lower()
     token = ""
 
@@ -49,8 +51,30 @@ class WFHistogram:
           try:
             self.freq[token] += 1
           except:
-            self.freq[token] = 1
-            self.tokens.add( token )
+            # Managing plurals 
+            if self.locale == "fr":
+              # It seems to be a french plural, let's try singular
+              if token[len( token ) - 1] == 's':
+                try:
+                  tk = token[0:len(token) - 2]
+                  self.freq[ tk ] += 1
+                  self.tokens.add(tk)
+                except:
+                  self.freq[token] = 1
+              
+              # It seems to be a french singular, let's try plural
+              else:
+                try:
+                  tk = token + 's'
+                  self.freq[ tk ] += 1
+                  self.tokens.add(tk)
+                except:
+                  self.freq[token] = 1
+            
+            # This locale has no planned behaviour
+            else:            
+              self.freq[token] = 1
+              self.tokens.add( token )
         
         # resetting token
         token = ""
@@ -152,6 +176,32 @@ class WFHistogram:
         #out += "%s;%f\n" % (w[0], score)
 
     return out
+
+  def csv_print(self, cutoff = 0, normalization = True):
+    """
+    Transforms histogram in a human readable string 
+    (CSV formatting)
+    """
+    s_hist = sorted(iter(self.freq.items()), key=operator.itemgetter(1))
+    s_hist.reverse()
+    
+    if len(s_hist) < 1:
+      return "" 
+    max = float( s_hist[0][1] )
+    out = ""
+    
+    for w in s_hist:
+      score = 0
+      if normalization:
+        score = float(w[1]) / max 
+      else:
+        score = float( w[1] )
+    
+      if score > cutoff:
+        out += "%s;%f\n" % (w[0], score)
+
+    return out
+  
 
   def filter_print(self, filter):
     """
